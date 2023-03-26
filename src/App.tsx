@@ -8,60 +8,88 @@ function App() {
   // updated state can be accessed via useEffect
   useEffect(() => {
     console.log(todos);
-  }, [todos]);
 
-  const addTodo = (e: React.SyntheticEvent) => {
-    const input = document.querySelector(".to-do-input") as HTMLInputElement;
+    // This handler enables the global overlay for adding a new to-do
+    const globalKeyDownHandler = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        return;
+      }
 
-    if (!input.value) {
-      return;
-    }
+      setOverlay(true);
 
-    // identifier for new todo
-    const id = Date.now().toString();
-
-    const removeHandler = (id: string) => {
-      console.log(`Deleting ${id}`);
-      setTodos((todos) => todos.filter((todo) => todo.props.id !== id));
+      // ESC -> Remove overlay
+      if (e.key === "Escape") {
+        setOverlay(false);
+      }
     };
 
-    // add new todo
-    const todo = (
-      <Todo key={id} id={id} text={input.value} remove={removeHandler} />
-    );
-    setTodos(todos.concat(todo));
+    // Global key event listener
+    document.addEventListener("keydown", globalKeyDownHandler);
 
-    input.value = "";
-  };
+    // This part avoids the duplication of every caught keydown event
+    return () => {
+      document.removeEventListener("keydown", globalKeyDownHandler);
+    };
+  }, [todos]);
 
   const addTodoHandler = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      addTodo(e);
-    }
-  };
+      const input = document.querySelector(".todo-input") as HTMLInputElement;
 
-  const removeAllHandler = (e: React.KeyboardEvent) => {
-    // return;
+      if (!input.value) {
+        return;
+      }
 
-    if (e.key === "Backspace") {
-      setTodos((todos) => (todos = []));
+      const id = Date.now().toString();
+
+      const removeHandler = (id: string) => {
+        console.log(`Deleting ${id}`);
+        setTodos((todos) => todos.filter((todo) => todo.props.id !== id));
+      };
+
+      // add new todo
+      const todo = (
+        <Todo key={id} id={id} text={input.value} remove={removeHandler} />
+      );
+      setTodos(todos.concat(todo));
+
+      input.value = "";
+      setOverlay(false);
     }
   };
 
   return (
-    <div className="App" onKeyDown={removeAllHandler}>
-      <h1>A very simple To-Do app with React</h1>
-      <div className="actions">
-        <input
-          className="to-do-input"
-          type={"text"}
-          onKeyDown={addTodoHandler}
-        />
-        <button onClick={addTodo}>Add</button>
+    <div className="App">
+      <div className="todo-container">
+        <div className="add-todo-hint">Type something to start</div>
+        <div className="todos">{todos}</div>
       </div>
-      <div className="todo-container">{todos}</div>
+      <div className="add-todo-overlay" onKeyDown={addTodoHandler}>
+        <div className="actions-container">
+          <div className="actions">
+            <div>Add a new to-do</div>
+            <input className="todo-input" type="text" />
+          </div>
+        </div>
+      </div>
     </div>
   );
+}
+
+function setOverlay(enabled: boolean) {
+  const overlay = document.querySelector(".add-todo-overlay") as HTMLDivElement;
+  const input = document.querySelector(".todo-input") as HTMLInputElement;
+
+  if (enabled) {
+    overlay.style.opacity = "1";
+    overlay.style.zIndex = "1";
+    input.focus();
+    return;
+  }
+
+  overlay.style.opacity = "0";
+  overlay.style.zIndex = "-1";
+  input.blur();
 }
 
 export default App;

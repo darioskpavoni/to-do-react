@@ -1,5 +1,4 @@
 .App {
-  margin: 2em;
   height: 100%;
   width: 50%;
   display: flex;
@@ -8,21 +7,81 @@
   align-items: center;
 }
 
-.actions {
-  padding: 1em;
-  width: 30%;
+.todo-container {
+  height: 100%;
+  width: 100%;
+  margin-top: 2em;
+
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.todo-container {
-  height: 50%;
-  width: 75%;
-  margin-top: 2em;
+.add-todo-hint {
+  font-size: 2rem;
+  font-style: italic;
+  opacity: 0.75;
+  margin: 0;
+}
+
+.todos {
+  height: 100%;
+  width: 100%;
+  margin-top: 0.5em;
 
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
+}
+
+.add-todo-overlay {
+  position: fixed;
+  opacity: 0;
+  z-index: -1;
+
+  height: 100%;
+  width: 100%;
+  background-color: rgb(173, 182, 230);
+
+  transition: opacity 0.1s ease-in-out;
+}
+
+.actions-container {
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.actions > div {
+  font-size: 2.5rem;
+  opacity: 0.5;
+  user-select: none;
+  margin-bottom: 0.5rem;
+}
+
+.actions > input {
+  background-color: transparent;
+  border: 1px black;
+  border-style: dashed none;
+
+  padding: 0.25rem 0.5rem;
+  font-size: 2.5rem;
+  font-weight: 300;
+}
+
+.actions > input:active,
+.actions > input:focus {
+  outline: none;
 }
