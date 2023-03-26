@@ -1,0 +1,10 @@
+.todo-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 4rem;
+  width: autop;
+
+  background-color: lightblue;
+}

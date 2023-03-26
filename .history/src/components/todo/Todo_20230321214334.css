@@ -1,0 +1,9 @@
+.todo-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 4rem;
+  width: 5rem;
+  background-color: lightblue;
+}

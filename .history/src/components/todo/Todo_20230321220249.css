@@ -1,0 +1,45 @@
+.todo-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+
+  margin: 1em;
+  padding: 1em;
+
+  text-align: center;
+
+  height: 4rem;
+  min-width: 10rem;
+  border-radius: 5px;
+
+  background-color: lightblue;
+}
+
+.todo-item:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn {
+  opacity: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border-radius: 3px;
+  width: 1rem;
+  height: 1rem;
+  font-size: 10pt;
+
+  transition: background-color opacity 0.1s ease-in-out;
+}
+
+.delete-btn:hover {
+  cursor: pointer;
+  background-color: rgb(216, 37, 37);
+}
