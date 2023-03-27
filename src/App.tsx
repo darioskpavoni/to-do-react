@@ -3,11 +3,35 @@ import "./App.css";
 import Todo from "./components/todo/Todo";
 
 function App() {
-  const [todos, setTodos] = useState<JSX.Element[]>([]);
+  const [todos, setTodos] = useState<JSX.Element[]>(() => {
+    return [];
 
-  // updated state can be accessed via useEffect
+    // Find out a way to render the todos from the local storage
+
+    const localStorageTodos = localStorage.getItem("todos") as string;
+
+    if (!localStorageTodos) return [];
+
+    let restoredTodos: JSX.Element[] = [];
+    (JSON.parse(localStorageTodos) as JSX.Element[]).forEach((todo) => {
+      restoredTodos = restoredTodos.concat(todo);
+    });
+
+    console.log(`RESTORED TODOS`);
+    console.log(restoredTodos);
+
+    return restoredTodos;
+  });
+
+  // updated state of todos can be accessed via useEffect
   useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
     console.log(todos);
+
+    if (todos.length > 0) {
+      const hint = document.querySelector(".add-todo-hint") as HTMLDivElement;
+      hint.innerText = "Your stuff";
+    }
 
     // This handler enables the global overlay for adding a new to-do
     const globalKeyDownHandler = (e: KeyboardEvent) => {
