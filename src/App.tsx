@@ -2,60 +2,29 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Todo from "./components/todo/Todo";
 
+interface ITodo {
+  id: string;
+  text: string;
+}
+
+const globalKeyDownHandler = (e: KeyboardEvent) => {
+  if (e.key === "Enter" || e.key === "F5") {
+    e.stopPropagation();
+    return;
+  }
+
+  if (e.key === "Escape") {
+    displayOverlay(false);
+    return;
+  }
+
+  displayOverlay(true);
+};
+
 function App() {
-  const [todos, setTodos] = useState<JSX.Element[]>(() => {
-    return [];
+  const [data, setData] = useState<ITodo[]>([]);
 
-    // Find out a way to render the todos from the local storage
-
-    const localStorageTodos = localStorage.getItem("todos") as string;
-
-    if (!localStorageTodos) return [];
-
-    let restoredTodos: JSX.Element[] = [];
-    (JSON.parse(localStorageTodos) as JSX.Element[]).forEach((todo) => {
-      restoredTodos = restoredTodos.concat(todo);
-    });
-
-    console.log(`RESTORED TODOS`);
-    console.log(restoredTodos);
-
-    return restoredTodos;
-  });
-
-  // updated state of todos can be accessed via useEffect
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-    console.log(todos);
-
-    if (todos.length > 0) {
-      const hint = document.querySelector(".add-todo-hint") as HTMLDivElement;
-      hint.innerText = "Your stuff";
-    }
-
-    // This handler enables the global overlay for adding a new to-do
-    const globalKeyDownHandler = (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
-        return;
-      }
-
-      setOverlay(true);
-
-      // ESC -> Remove overlay
-      if (e.key === "Escape") {
-        setOverlay(false);
-      }
-    };
-
-    // Global key event listener
-    document.addEventListener("keydown", globalKeyDownHandler);
-
-    // This part avoids the duplication of every caught keydown event
-    return () => {
-      document.removeEventListener("keydown", globalKeyDownHandler);
-    };
-  }, [todos]);
-
+  // Handlers
   const addTodoHandler = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       const input = document.querySelector(".todo-input") as HTMLInputElement;
@@ -64,29 +33,61 @@ function App() {
         return;
       }
 
-      const id = Date.now().toString();
-
-      const removeHandler = (id: string) => {
-        console.log(`Deleting ${id}`);
-        setTodos((todos) => todos.filter((todo) => todo.props.id !== id));
+      const todo: ITodo = {
+        id: Date.now().toString(),
+        text: input.value,
       };
 
-      // add new todo
-      const todo = (
-        <Todo key={id} id={id} text={input.value} remove={removeHandler} />
-      );
-      setTodos(todos.concat(todo));
+      setData([...data, todo]);
 
       input.value = "";
-      setOverlay(false);
+      displayOverlay(false);
     }
   };
+
+  const removeHandler = (id: string) => {
+    setData(data.filter((todo) => todo.id !== id));
+  };
+
+  // Global key event listener
+  document.addEventListener("keydown", globalKeyDownHandler);
+
+  // This runs only once at the beginning
+  useEffect(() => {
+    const localStorageData = localStorage.getItem("data") as string;
+    const restoredData = JSON.parse(localStorageData) as ITodo[];
+
+    if (!restoredData?.length) {
+      return;
+    }
+
+    setData([...restoredData]);
+  }, []);
+
+  // Updated state of todos can be accessed via useEffect
+  useEffect(() => {
+    localStorage.setItem("data", JSON.stringify(data));
+
+    if (data.length > 0) {
+      const hint = document.querySelector(".add-todo-hint") as HTMLDivElement;
+      hint.innerText = "Your stuff";
+    }
+  }, [data]);
 
   return (
     <div className="App">
       <div className="todo-container">
         <div className="add-todo-hint">Type something to start</div>
-        <div className="todos">{todos}</div>
+        <div className="todos">
+          {data.map((todo) => (
+            <Todo
+              key={todo.id}
+              id={todo.id}
+              text={todo.text}
+              remove={removeHandler}
+            />
+          ))}
+        </div>
       </div>
       <div className="add-todo-overlay" onKeyDown={addTodoHandler}>
         <div className="actions-container">
@@ -100,7 +101,7 @@ function App() {
   );
 }
 
-function setOverlay(enabled: boolean) {
+function displayOverlay(enabled: boolean) {
   const overlay = document.querySelector(".add-todo-overlay") as HTMLDivElement;
   const input = document.querySelector(".todo-input") as HTMLInputElement;
 

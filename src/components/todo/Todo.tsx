@@ -1,13 +1,13 @@
 import React from "react";
 import "./Todo.css";
 
-interface ITodo {
-  text: string;
+interface ITodoCmp {
   id: string;
+  text: string;
   remove: (id: string) => void;
 }
 
-const Todo = (props: ITodo) => {
+const Todo = (props: ITodoCmp) => {
   return (
     <div className="todo-item">
       <div
